@@ -1,35 +1,31 @@
 name: Terraform Workflow Destroy
 
+
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: # Trigger the workflow manually from the GitHub Actions UI
 
 jobs:
-  terraform:
-    name: Terraform Actions
+  terraform-destroy:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
-    defaults:
-      run:
-        working-directory: raksrc1
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: v1.5.6
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        
 
-      - name: Terraform Init
-        run: terraform init
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
 
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
 
   
